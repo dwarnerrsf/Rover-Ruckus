@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -48,7 +49,8 @@ import com.qualcomm.robotcore.hardware.Servo;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Auto: Team 12605 Crater", group="Iterative Opmode")
+@TeleOp(name="Auto: Team 12605 Crater ", group="Iterative Opmode")
+@Disabled
 public class AutoOpTeam12605_2 extends OpMode
 {
     // Declare OpMode members.

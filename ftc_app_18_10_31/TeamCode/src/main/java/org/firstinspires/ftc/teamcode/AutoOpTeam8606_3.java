@@ -34,6 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.Modules.GyroModule;
 import org.firstinspires.ftc.teamcode.Modules.TensorFlowModule;
 
 /*
@@ -55,6 +56,7 @@ public class AutoOpTeam8606_3 extends OpMode
 {
     // Declare OpMode members.
     private TensorFlowModule detector = new TensorFlowModule();
+    private GyroModule gyro = new GyroModule();
 
     private DcMotor driveLeftFront = null;
     private DcMotor driveLeftBack = null;
@@ -65,10 +67,12 @@ public class AutoOpTeam8606_3 extends OpMode
     private Servo marker = null;
     private String sample = "";
     private boolean endgame = false;
+    private boolean dropOnly = false;
     private int ascend = -2800;
     private int decend = -10;
     private int stage = 0;
     private double timestamp = 0.0f;
+    private double padTime = 0.0d;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -76,6 +80,7 @@ public class AutoOpTeam8606_3 extends OpMode
     @Override
     public void init() {
         detector.init(this);
+        gyro.init(this);
 
         driveLeftFront = hardwareMap.get(DcMotor.class, "LF");
         driveLeftFront.setDirection(DcMotor.Direction.REVERSE);
@@ -139,6 +144,7 @@ public class AutoOpTeam8606_3 extends OpMode
     @Override
     public void start() {
         detector.start();
+        gyro.start();
 
         driveLeftFront.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         driveLeftBack.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -155,10 +161,12 @@ public class AutoOpTeam8606_3 extends OpMode
      */
     @Override
     public void loop() {
+        double heading = gyro.loop();
+
         switch (stage) {
             case 0:
                 // Sample Minerals
-                if (sample == "" && wait(5.0d) > time) {
+                if (sample == "" /*&& wait(5.0d) > time*/) {
                     sample = detector.loop(this);
                 } else {
                     next();
@@ -190,7 +198,7 @@ public class AutoOpTeam8606_3 extends OpMode
                 break;
             case 3:
                 // Turn
-                if (wait(0.60d) > time) {
+                if (/*wait(0.80d) > time*/ heading < 20.0d) {
                     move(-0.30d, 0.30d, DcMotor.RunMode.RUN_USING_ENCODER);
                 } else {
                     move(0.0d);
@@ -227,7 +235,7 @@ public class AutoOpTeam8606_3 extends OpMode
                 break;
             case 6:
                 // Turn Back
-                if (wait(0.50d) > time) {
+                if (/*wait(0.65d) > time*/ heading > 5.0d) {
                     move(0.30d, -0.30d, DcMotor.RunMode.RUN_USING_ENCODER);
                 } else {
                     move(0.0d);
@@ -256,6 +264,8 @@ public class AutoOpTeam8606_3 extends OpMode
                 // Calculate Turn
                 if (wait(0.50f) > time) {
 
+                } else if (dropOnly) {
+                    stage = 1000;
                 } else {
                     if (sample.equals("Left")) {
                         telemetry.addData("Status: ", "Left");
@@ -271,7 +281,7 @@ public class AutoOpTeam8606_3 extends OpMode
                 break;
             case 10:
                 // Angle Left
-                if (wait(0.60d) > time) {
+                if (/*wait(0.60d) > time*/ heading < 22.0d) {
                     move(-0.30d, 0.30d, DcMotor.RunMode.RUN_USING_ENCODER);
                 } else {
                     move(0.0d);
@@ -280,7 +290,7 @@ public class AutoOpTeam8606_3 extends OpMode
                 break;
             case 11:
                 // Angle Right
-                if (wait(0.60d) > time) {
+                if (/*wait(0.60d) > time*/ heading > -25.0d) {
                     move(0.30d, -0.30d, DcMotor.RunMode.RUN_USING_ENCODER);
 
                 } else {
@@ -317,7 +327,7 @@ public class AutoOpTeam8606_3 extends OpMode
                 break;
             case 14:
                 // Angle Right
-                if (wait(1.05d) > time) {
+                if (/*wait(1.05d) > time*/ heading > -25.0d) {
                     move(0.30d, -0.30d, DcMotor.RunMode.RUN_USING_ENCODER);
                 } else {
                     move(0.0d);
@@ -326,7 +336,7 @@ public class AutoOpTeam8606_3 extends OpMode
                 break;
             case 15:
                 // Angle Left
-                if (wait(0.90d) > time) {
+                if (/*wait(1.15d) > time*/ heading < 22.0d) {
                     move(-0.30d, 0.30d, DcMotor.RunMode.RUN_USING_ENCODER);
 
                 } else {
@@ -335,8 +345,9 @@ public class AutoOpTeam8606_3 extends OpMode
                 }
                 break;
             case 16:
+                padTime = 0.15d;
                 // Move Forward
-                if (wait(0.55d) > time) {
+                if (wait(0.55d + padTime) > time) {
                     move(0.70d, DcMotor.RunMode.RUN_USING_ENCODER);
                 }
                 else {
@@ -346,7 +357,7 @@ public class AutoOpTeam8606_3 extends OpMode
                 break;
             case 17:
                 // Forward Deposit
-                if (wait(1.0d) > time) {
+                if (wait(3.0d) > time) {
                     marker.setPosition(0.60d);
                 }
                 else {
@@ -354,9 +365,18 @@ public class AutoOpTeam8606_3 extends OpMode
                 }
                 break;
             case 18:
+                // Angle ???
+                if (/*wait(1.0d) > time*/ heading > -45.0d) {
+                    move(0.30d, -0.30d, DcMotor.RunMode.RUN_USING_ENCODER);
+                } else {
+                    move(0.0d);
+                    next(19);
+                }
+                break;
+            case 19:
                 // Move Backwards
-                if (wait(0.30d) > time) {
-                    move(-0.25d, DcMotor.RunMode.RUN_USING_ENCODER);
+                if (wait(2.5d) > time) {
+                    move(-0.75d, DcMotor.RunMode.RUN_USING_ENCODER);
                 }
                 else {
                     move(0.0d);
@@ -561,10 +581,13 @@ public class AutoOpTeam8606_3 extends OpMode
                 break;
         }*/
 
+
+
         telemetry.addData("Time: ", time);
         telemetry.addData("Stage: ", stage);
 
         telemetry.addData("Sample: ", sample);
+        telemetry.addData("Heading: ", heading);
 
         telemetry.addData("Lift Left: ", liftLeft.getCurrentPosition());
         telemetry.addData("Lift Right: ", liftRight.getCurrentPosition());
