@@ -29,6 +29,9 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -79,6 +82,10 @@ public class AutoOpTeam12605_4 extends OpMode {
      */
     @Override
     public void init() {
+        SharedPreferences test = this.hardwareMap.appContext.getSharedPreferences("", Context.MODE_PRIVATE);
+
+
+
         detector.init(this);
         gyro.init(this);
 
@@ -281,7 +288,7 @@ public class AutoOpTeam12605_4 extends OpMode {
                 break;
             case 10:
                 // Angle Left
-                if (/*wait(0.60d) > time*/ heading < 22.0d) {
+                if (/*wait(0.60d) > time*/ /*heading < 22.0d*/ heading < 18.0d) {
                     move(-0.30d, 0.30d, DcMotor.RunMode.RUN_USING_ENCODER);
                 } else {
                     move(0.0d);
@@ -330,7 +337,7 @@ public class AutoOpTeam12605_4 extends OpMode {
                 break;
             case 14:
                 // Angle Right
-                if (/*wait(1.0d) > time*/ heading > -25.0d) {
+                if (/*wait(1.0d) > time*/ /*heading > -25.0d*/ heading > -27.0d) {
                     move(0.30d, -0.30d, DcMotor.RunMode.RUN_USING_ENCODER);
                 } else {
                     move(0.0d);
@@ -339,7 +346,7 @@ public class AutoOpTeam12605_4 extends OpMode {
                 break;
             case 15:
                 // Angle Left
-                if (/*wait(0.95d) > time*/ heading < 22.0d) {
+                if (/*wait(0.95d) > time*/ /*heading < 22.0d*/ heading < 24.0d) {
                     move(-0.30d, 0.30d, DcMotor.RunMode.RUN_USING_ENCODER);
 
                 } else {

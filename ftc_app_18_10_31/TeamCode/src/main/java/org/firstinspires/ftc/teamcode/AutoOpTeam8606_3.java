@@ -163,6 +163,11 @@ public class AutoOpTeam8606_3 extends OpMode
     public void loop() {
         double heading = gyro.loop();
 
+        if (heading > 15.0d || heading < -15.0d)
+        {
+            stop();
+        }
+
         switch (stage) {
             case 0:
                 // Sample Minerals
